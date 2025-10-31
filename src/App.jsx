@@ -7,6 +7,7 @@ import {
   loadAssignments, 
   loadSubmissions 
 } from './utils/storage'
+import Login from './components/Login'
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null)
@@ -32,36 +33,103 @@ function App() {
     setIsLoading(false)
   }, [])
 
+  const handleLogin = (user) => {
+    setCurrentUser(user)
+  }
+
+  const updateAssignments = (newAssignments) => {
+    setAssignments(newAssignments)
+  }
+
+  const updateSubmissions = (newSubmissions) => {
+    setSubmissions(newSubmissions)
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-xl text-gray-600">Loading...</div>
+          <div className="text-xl text-orange-600">Loading...</div>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Student Assignment Management System
-        </h1>
-        
-        {/* Development info - will be replaced with actual components in next tasks */}
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Project Foundation Ready</h2>
-          <div className="space-y-2 text-gray-600">
-            <p>✅ Mock data loaded: {users.length} users, {assignments.length} assignments</p>
-            <p>✅ localStorage utilities configured</p>
-            <p>✅ Tailwind CSS properly configured</p>
-            <p>✅ Data persistence initialized</p>
-          </div>
-          <div className="mt-4 text-sm text-gray-500">
-            Components will be added in subsequent tasks
-          </div>
+  // Role-based conditional rendering
+  const renderContent = () => {
+    if (!currentUser) {
+      return <Login users={users} onLogin={handleLogin} />
+    }
+
+    if (currentUser.role === 'student') {
+      return (
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg border border-orange-100 p-6">
+          <h2 className="text-xl font-semibold text-orange-800 mb-4">
+            Welcome, {currentUser.name} (Student)
+          </h2>
+          <p className="text-amber-700">
+            Student dashboard will be implemented in task 4
+          </p>
         </div>
+      )
+    }
+
+    if (currentUser.role === 'admin') {
+      return (
+        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg border border-orange-100 p-6">
+          <h2 className="text-xl font-semibold text-orange-800 mb-4">
+            Welcome, {currentUser.name} (Admin)
+          </h2>
+          <p className="text-amber-700">
+            Admin dashboard will be implemented in task 7
+          </p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg border border-red-200 p-6">
+        <h2 className="text-xl font-semibold text-red-600 mb-4 text-center">
+          Invalid User Role
+        </h2>
+        <p className="text-red-500 text-center">
+          Please contact administrator
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-orange-50">
+      {/* Responsive container with proper spacing */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header section */}
+        <header className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left text-orange-900 mb-2 sm:mb-0">
+              Student Assignment Management System
+            </h1>
+            {currentUser && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <div className="text-center sm:text-right text-sm text-amber-700">
+                  Logged in as: {currentUser.name} ({currentUser.role})
+                </div>
+                <button
+                  onClick={() => handleLogin(null)}
+                  className="px-3 py-1 text-sm bg-orange-100 hover:bg-orange-200 text-orange-800 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </header>
+
+        <main>
+          {renderContent()}
+        </main>
+
+    
       </div>
     </div>
   )
